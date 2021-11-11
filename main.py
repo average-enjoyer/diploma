@@ -48,7 +48,8 @@ def generating():
                                 'OPTIONS' or 'NOTIFY') not in field_value or field_name == 'sip.Status-Line':
                             caller.write(field_value + "\n")
                         if field_name == 'sip.Via' or field_name == 'sip.From' or field_name == 'sip.To' or field_name == 'sip.Call-ID' or field_name == 'sip.CSeq' or field_name == 'sip.Contact' or field_name == 'sip.Max-Forwards' or field_name == 'sip.Subject' or field_name == 'sip.mime.type' or field_name == 'sip.Content-Length' or field_name == 'sip.User-Agent':
-                            # if field_name == 'sip.Call-ID':
+                            if field_name == 'sip.Call-ID':
+                                print (field_value, "\n")
                             # dict =
                             # packet_list[counter].append(field_value)
                             # counter += 1
@@ -85,30 +86,33 @@ def generating():
     callee.close()
 
 
-root['bg'] = '#fafafa'
+root['bg'] = '#d9ed92'
 root.title('SIPp generator')
 root.geometry('600x600')
-# root.iconbitmap("my.ico") # icon
+
+img = PhotoImage(file='inventory/phone.png')
+root.tk.call('wm', 'iconphoto', root._w, img)
+
 
 frame_top = Frame(root, bg='#fbfbfb', bd=5)
-frame_top.place(relx=0.15, rely=0.15, relwidth=0.7, relheight=0.25)
+frame_top.place(relx=0.05, rely=0.05)
 
 # List of call-ids
-# listbox_entries = ["Entry 1", "Entry 2",
-#                    "Entry 3", "Entry 4"]
-# listbox_widget = Listbox(root)
-# for entry in listbox_entries:
-#     listbox_widget.insert(END, entry)
-# listbox_widget.pack()
+listbox_entries = ["Entry 1", "Entry 2",
+                   "Entry 3", "Entry 4"]
+listbox_widget = Listbox(root)
+for entry in listbox_entries:
+    listbox_widget.insert(END, entry)
+listbox_widget.place(relx=0.15, rely=0.25)
 
 
 frame_bottom = Frame(root, bg='#fbfbfb', bd=5)
-frame_bottom.place(relx=0.15, rely=0.55, relwidth=0.7, relheight=0.25)
+frame_bottom.place(relx=0.05, rely=0.55)
 
 btn = Button(frame_top, text='Choose a .pcap file', command=open_file)
 btn.pack()
 
-info = Label(frame_bottom, text='shit', bg='#ffb700', font=40)
+info = Label(frame_bottom, text='Choose the Call-ID and press Generate', bg='#ffb700', font=40)
 info.pack()
 # frm = ttk.Frame(root, padding=10)
 # frm.grid()

@@ -7,6 +7,7 @@
 import asyncio
 from tkinter import *
 from tkinter.filedialog import askopenfilename
+
 import pyshark
 
 try:
@@ -24,6 +25,10 @@ except ImportError:
     py3 = True
 
 import main_support
+
+# SIPp files
+caller = open("caller.xml", "w")
+callee = open("callee.xml", "w")
 
 
 def vp_start_gui():
@@ -93,10 +98,34 @@ def parse_call_ids(pcap_file):
     return listbox_entries
 
 
-def generate(listbox):
+def cli_cld_getter(pcap_file):
+    capture = pyshark.FileCapture(pcap_file)
+
+    for packet in capture:
+        try:
+            if hasattr(packet, 'sip'):
+                field_names = packet.sip._all_fields
+                field_values = packet.sip._all_fields.values()
+                for field_name, field_value in zip(field_names, field_values):
+                    if field_name == 'sip.Request-Line':
+                        print(field_value)
+        except OSError:
+            pass
+        except asyncio.TimeoutError:
+            pass
+
+
+def generate(listbox, Label2):
     # Get the selected Call-ID from the ListBox component
+
+    pcap_file = Label2['text']
+
     for i in listbox.curselection():
         print(listbox.get(i))
+        caller.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?> <!DOCTYPE scenario SYSTEM \sipp.dtd\"\n<scenario name=\"UAC with media\">\n \
+    <send retrans=\"500\">")
+        print("QQQQQQQQQQQQQQQQ", pcap_file)
+        cli_cld_getter(pcap_file)
 
 
 
@@ -124,6 +153,11 @@ class Toplevel1:
         _compcolor = '#d9d9d9'  # X11 color: 'gray85'
         _ana1color = '#d9d9d9'  # X11 color: 'gray85'
         _ana2color = '#ececec'  # Closest X11 color: 'gray92'
+
+        # termf = Frame(root, height=400, width=500)
+        # termf.pack(fill=BOTH, expand=YES)
+        # wid = termf.winfo_id()
+        # os.system('xterm -into %d -geometry 40x20 -sb &' % wid)
 
         pcap_file = '''The file hasn't been chosen.'''
         top.geometry("610x480+645+330")
@@ -168,7 +202,8 @@ class Toplevel1:
         self.Button2.configure(borderwidth="2")
         self.Button2.configure(cursor="gobbler")
         self.Button2.configure(text='''Generate''')
-        self.Button2.configure(command=lambda: generate(self.Listbox1)) # lambda is important when we pass arguments
+
+        self.Button2.configure(command=lambda: generate(self.Listbox1, self.Label2))  # lambda is important when we pass arguments
 
         self.menubar = tk.Menu(top, font="TkMenuFont", bg=_bgcolor, fg=_fgcolor)
         top.configure(menu=self.menubar)

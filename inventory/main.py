@@ -5,8 +5,6 @@
 #  in conjunction with Tcl version 8.6
 #    Nov 11, 2021 05:20:09 PM EET  platform: Linux
 import asyncio
-import sys
-from enum import unique
 from tkinter import *
 from tkinter.filedialog import askopenfilename
 import pyshark
@@ -69,8 +67,6 @@ def get_unique_list(list):
 def parse_call_ids(pcap_file):
     capture = pyshark.FileCapture(pcap_file)
     listbox_entries = []
-    # listbox_entries = ["Entry 1", "Entry 2",
-    #                    "Entry 3", "Entry 4"]
 
     for packet in capture:
         try:
@@ -82,7 +78,7 @@ def parse_call_ids(pcap_file):
                     if field_name != '':
                         # exclude BLF packets
                         if field_name == 'sip.Request-Line' and (
-                                'OPTIONS' or 'NOTIFY') not in field_value or field_name == 'sip.Status-Line':
+                                'OPTIONS' or 'NOTIFY' or 'OPTIONS') not in field_value or field_name == 'sip.Status-Line':
                             str1 = packet.sip.msg_hdr.replace('  ', '\n')
                             # packet as an array
                             in_arr = str1.split("\n")
@@ -95,6 +91,13 @@ def parse_call_ids(pcap_file):
             pass
 
     return listbox_entries
+
+
+def generate(listbox):
+    # Get the selected Call-ID from the ListBox component
+    for i in listbox.curselection():
+        print(listbox.get(i))
+
 
 
 class Toplevel1:
@@ -147,7 +150,6 @@ class Toplevel1:
         self.Label2 = tk.Label(top)
         self.Label2.place(relx=0.033, rely=0.288, height=33, width=556)
         self.Label2.configure(activebackground="#f9f9f9")
-        self.Label2.configure(cursor="fleur")
         self.Label2.configure(font="-family {Tlwg Typewriter} -size 12")
         self.Label2.configure(text=pcap_file)
 
@@ -155,11 +157,10 @@ class Toplevel1:
         self.Listbox1.place(relx=0.033, rely=0.445, relheight=0.169
                             , relwidth=0.931)
         self.Listbox1.configure(background="white")
-        self.Listbox1.configure(cursor="fleur")
         self.Listbox1.configure(font="-family {Tlwg Typewriter} -size 10")
         self.Listbox1.configure(selectbackground="#4603ff")
         self.Listbox1.configure(selectforeground="white")
-        # self.Listbox1.configure(setgrid="1") # brokes window
+        # self.Listbox1.configure(setgrid="1") # breaks window
 
         self.Button2 = tk.Button(top)
         self.Button2.place(relx=0.411, rely=0.668, height=31, width=91)
@@ -167,6 +168,7 @@ class Toplevel1:
         self.Button2.configure(borderwidth="2")
         self.Button2.configure(cursor="gobbler")
         self.Button2.configure(text='''Generate''')
+        self.Button2.configure(command=lambda: generate(self.Listbox1)) # lambda is important when we pass arguments
 
         self.menubar = tk.Menu(top, font="TkMenuFont", bg=_bgcolor, fg=_fgcolor)
         top.configure(menu=self.menubar)
@@ -174,13 +176,11 @@ class Toplevel1:
         self.Label3 = tk.Label(top)
         self.Label3.place(relx=0.033, rely=0.378, height=23, width=111)
         self.Label3.configure(activebackground="#f9f9f9")
-        self.Label3.configure(cursor="fleur")
         self.Label3.configure(font="-family {Tlwg Typewriter} -size 12")
         self.Label3.configure(text='''Call-IDs:''')
 
         self.Label4 = tk.Label(top)
         self.Label4.place(relx=0.033, rely=0.731, height=34, width=149)
-        self.Label4.configure(cursor="fleur")
         self.Label4.configure(font="-family {Tlwg Typewriter} -size 12")
         self.Label4.configure(text='''Log messages:''')
 

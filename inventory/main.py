@@ -99,7 +99,8 @@ def parse_call_ids(pcap_file):
     return listbox_entries
 
 
-def cli_cld_getter(pcap_file):
+def cli_cld_getter(pcap_file): # to change to 'dif list' of needed SIP packets. It'll return an array with all the
+    # packets. After that there won't be any parsings of .pcap file. Only going through the array
     capture = pyshark.FileCapture(pcap_file)
 
     arr = []
@@ -119,6 +120,7 @@ def cli_cld_getter(pcap_file):
             pass
         except asyncio.TimeoutError:
             pass
+
 
 def generate(listbox, Label2):
     # Get the selected Call-ID from the ListBox component

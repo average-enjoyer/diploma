@@ -100,12 +100,12 @@ def parse_call_ids(pcap_file):
     return listbox_entries
 
 
-def cli_cld_getter(pcap_file): # to change to 'dif list' of needed SIP packets. It'll return an array with all the
-                               # packets. After that there won't be any parsings of .pcap file. Only going through the array
+def cli_cld_getter(pcap_file):  # to change to 'dif list' of needed SIP packets. It'll return an array with all the
+    # packets. After that there won't be any parsings of .pcap file. Only going through the array
     capture = pyshark.FileCapture(pcap_file)
 
-    arr = [] # Full list of the SIP packets. It' filtered that the packets are unique (Resent Packet: False) and No
-             # BLF or OPTIONS packets.
+    arr = []  # Full list of the SIP packets. It' filtered that the packets are unique (Resent Packet: False) and No
+    # BLF or OPTIONS packets.
     arr_caller = []
     arr_callee = []
 
@@ -125,48 +125,28 @@ def cli_cld_getter(pcap_file): # to change to 'dif list' of needed SIP packets. 
             pass
         except asyncio.TimeoutError:
             pass
-
+            # Finding CLI IP:PORT
     for packet in arr:
 
-        some_socket1 = ""
-        some_socket2 = ""
-        isInvite = False
-
-        field_names = packet.sip._all_fields # DICTIONARY!!!! we can take any value from there!
+        field_names = packet.sip._all_fields  # DICTIONARY!!!! we can take any value from there!
         field_values = packet.sip._all_fields.values()
 
-        print(field_names)
-
         if "sip.Method" in field_names:
-            print(field_names["sip.Method"])
-        #if (packet['sip.Method'] == "INVITE" and packet[sip.Via])
-
-        # for field_name, field_value in zip(field_names, field_values):
-        #     #print(packet.)
-        #     if field_name == "sip.Via":
-        #         some_socket1 = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_value)[0] # we get the first match
-        #         print("some socket1   ", some_socket1)                                               # because we can have something like this
-        #                                                                                              # "...192.168.0.100:9144;branch=z9hG4bK-524287-1---e99d7a784671561c;received=192.168.0.100;rport=9144
-        #
-        #     elif field_name == 'sip.Contact' and field_value:
-        #         some_socket2 = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_value)[0]  # we get the first match
-        #         print("some_socket2  ", some_socket2)
-        #     elif field_name == 'sip.Method':
-        #         print("field_value", field_value)
-        #         if field_value == "INVITE":
-        #             isInvite = True
-        #         else :
-        #             isInvite = False
-        #
-        #
-        # if some_socket1 == some_socket2 and isInvite:
-        #     print("CALLER:", some_socket1)
-        #     print("isInvite", isInvite)
-        # else:
-        #     print("CALLEE" )
-        #     print("isInvite", isInvite)
-        #     #print(packet.sip._all_fields.values())
-
+            if field_names["sip.Method"] == "INVITE" and \
+                    re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Via"])[0] == \
+                    re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Contact"])[0]:
+                caller_socket = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Contact"])
+                print(caller_socket)
+                break
+    # Finding CLD IP:PORT
+    for packet in arr:
+        field_names = packet.sip._all_fields  # DICTIONARY!!!! we can take any value from there!
+        field_values = packet.sip._all_fields.values()
+        if "sip.Status-Line" in field_names:
+            if "200 OK" in field_names["sip.Status-Line"] and "INVITE" in field_names["sip.CSeq"]:
+                caller_socket = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Contact"])
+                print(caller_socket)
+                break
 
 
 def generate(listbox, Label2):

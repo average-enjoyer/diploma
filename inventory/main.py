@@ -252,7 +252,7 @@ def generate(listbox, Label2):
     print("SIDE", side_ip)
     callee.write(
         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n<!DOCTYPE scenario SYSTEM \"sipp.dtd\">\n<scenario name=\"UAC\">\n")
-    for packet in arr_caller:
+    for packet in arr_callee:
         field_names = packet.sip._all_fields  # DICTIONARY!!!! we can take any value from there!
         field_values = packet.sip._all_fields.values()
 
@@ -303,7 +303,7 @@ def generate(listbox, Label2):
             if "sip.Status-Line" in field_names:
                 expected_code = "".join(re.findall(r'[0-9]{3}', field_names["sip.Status-Line"]))
                 callee.write("<recv response=\"" + expected_code + "\" optional=\"true\">\n</recv>\n")
-
+    callee.write("\n</scenario>")
     callee.close()
 
 

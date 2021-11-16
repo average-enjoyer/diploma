@@ -1,3 +1,69 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE scenario SYSTEM "sipp.dtd">
 <scenario name="UAC">
+<send>
+<![CDATA[
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/UDP 192.168.0.107:5060;branch=z9hG4bK3b09b217
+Contact: <sip:9999@192.168.0.100:9144>;+sip.instance="<urn:uuid:74dc8fb7-756f-4a78-a3fc-7382245e4137>"
+To: <sip:9999@192.168.0.100:9144>;tag=5c886778
+From: "7777" <sip:7777@192.168.0.107>;tag=as0b1dd6a1
+Call-ID: 50d22fb51e61aa33056b0f69390cff0b@192.168.0.107:5060
+CSeq: 102 INVITE
+User-Agent: PortSIP UC Client  Android - v16.0.001
+Content-Length: 0
+
+]]>
+</send>
+
+<send>
+<![CDATA[
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP 192.168.0.107:5060;branch=z9hG4bK3b09b217
+Contact: <sip:9999@192.168.0.100:9144>;+sip.instance="<urn:uuid:74dc8fb7-756f-4a78-a3fc-7382245e4137>"
+To: <sip:9999@192.168.0.100:9144>;tag=5c886778
+From: "7777" <sip:7777@192.168.0.107>;tag=as0b1dd6a1
+Call-ID: 50d22fb51e61aa33056b0f69390cff0b@192.168.0.107:5060
+CSeq: 102 INVITE
+User-Agent: PortSIP UC Client  Android - v16.0.001
+Content-Length: 233
+
+v=0
+o=- 1636728751 1 IN IP4 192.168.0.100
+s=ps
+c=IN IP4 192.168.0.100
+t=0 0
+m=audio 10000 RTP/AVP 0 8 101
+a=rtpmap:0 PCMU/8000
+a=rtpmap:8 PCMA/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-16
+a=mid:audio
+a=sendrecv
+
+]]>
+</send>
+
+<send>
+<![CDATA[
+
+BYE sip:7777@192.168.0.107:5060 SIP/2.0
+Via: SIP/2.0/UDP 192.168.0.100:9144;branch=z9hG4bK-524287-1---e99d7a784671561c;rport
+Max-Forwards: 70
+Contact: <sip:9999@192.168.0.100:9144>;+sip.instance="<urn:uuid:74dc8fb7-756f-4a78-a3fc-7382245e4137>"
+To: "7777"<sip:7777@192.168.0.107>;tag=as0b1dd6a1
+From: <sip:9999@192.168.0.100:9144>;tag=5c886778
+Call-ID: 50d22fb51e61aa33056b0f69390cff0b@192.168.0.107:5060
+CSeq: 2 BYE
+User-Agent: PortSIP UC Client  Android - v16.0.001
+Content-Length: 0
+
+]]>
+</send>
+
+<recv response="200" optional="true">
+</recv>
+
+</scenario>

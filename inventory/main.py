@@ -85,7 +85,7 @@ def parse_call_ids(pcap_file):
                     if field_name != '':
                         # exclude BLF packets
                         if field_name == 'sip.Request-Line' and (
-                                'OPTIONS' or 'NOTIFY' or 'OPTIONS') not in field_value or field_name == 'sip.Status-Line':
+                                'OPTIONS' or 'NOTIFY' or 'OPTIONS' or 'PUBLISH') not in field_value or field_name == 'sip.Status-Line':
                             str1 = packet.sip.msg_hdr.replace('  ', '\n')
                             # packet as an array
                             in_arr = str1.split("\n")
@@ -100,15 +100,14 @@ def parse_call_ids(pcap_file):
     return listbox_entries
 
 
-def cli_cld_getter(pcap_file):  # to change to 'dif list' of needed SIP packets. It'll return an array with all the
-    # packets. After that there won't be any parsings of .pcap file. Only going through the array
+def get_packets(
+        pcap_file):  # It'll return an array with all the packets. After that there won't be any parsings of .pcap file. Only going through the array
     capture = pyshark.FileCapture(pcap_file)
 
-    arr = []  # Full list of the SIP packets. It' filtered that the packets are unique (Resent Packet: False) and No
-    # BLF or OPTIONS packets.
-    arr_caller = []
-    arr_callee = []
-
+    packets = []  # Full list of the SIP packets. It' filtered that the packets are unique (Resent Packet: False) and No
+                  # BLF or OPTIONS packets.
+    caller_socket = ""
+    callee_socket = ""
 
     for packet in capture:
         try:
@@ -118,14 +117,19 @@ def cli_cld_getter(pcap_file):  # to change to 'dif list' of needed SIP packets.
                 for field_name, field_value in zip(field_names, field_values):
                     if "Resent Packet: True" not in str(packet):
                         if field_name == 'sip.Request-Line' and (
-                                'OPTIONS' or 'NOTIFY') not in field_value or field_name == 'sip.Status-Line':
-                            arr.append(packet)
+                                'OPTIONS' or 'NOTIFY' or 'PUBLISH') not in field_value or field_name == 'sip.Status-Line' and "OPTIONS" not in field_names["sip.CSeq"]:
+                            packets.append(packet)
 
         except OSError:
             pass
         except asyncio.TimeoutError:
             pass
-            # Finding CLI IP:PORT
+    return packets
+
+
+def cli_cld_getter(arr):
+    # Finding CLI IP:PORT
+    print(" PPPPP ", len(arr))
     for packet in arr:
 
         field_names = packet.sip._all_fields  # DICTIONARY!!!! we can take any value from there!
@@ -136,7 +140,7 @@ def cli_cld_getter(pcap_file):  # to change to 'dif list' of needed SIP packets.
                     re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Via"])[0] == \
                     re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Contact"])[0]:
                 caller_socket = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Contact"])
-                print(caller_socket)
+                print("CLI", caller_socket)
                 break
     # Finding CLD IP:PORT
     for packet in arr:
@@ -144,22 +148,54 @@ def cli_cld_getter(pcap_file):  # to change to 'dif list' of needed SIP packets.
         field_values = packet.sip._all_fields.values()
         if "sip.Status-Line" in field_names:
             if "200 OK" in field_names["sip.Status-Line"] and "INVITE" in field_names["sip.CSeq"]:
-                caller_socket = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Contact"])
-                print(caller_socket)
+                callee_socket = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b:[0-9]{1,5}', field_names["sip.Contact"])
+                print("CLD", callee_socket)
+                print("QQQQ", packet.ip.src)
                 break
+    return caller_socket, callee_socket
 
+
+def get_packets_by_side(packets, socket):
+
+    side_ip =  "".join(re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', "".join(socket[0])))
+
+    print("side_ip", side_ip)
+
+    result_list = []
+    for packet in packets:
+        field_names = packet.sip._all_fields  # DICTIONARY!!!! we can take any value from there!
+        print(packet.ip.src)
+
+        # check if the CLI == packet source ip
+        print("side_ip", side_ip, "~~~", packet.ip.src, packet.ip.dst)
+        if side_ip == packet.ip.src or side_ip == packet.ip.dst:  # "".join(cli_and_cld[0]) -- removes ['...'] coverage
+            result_list.append(packet)
+
+    return result_list
 
 def generate(listbox, Label2):
-    # Get the selected Call-ID from the ListBox component
-
     pcap_file = Label2['text']
+    # List with [CLI IP:PORT] and [CLD IP_PORT]
+    packets = get_packets(pcap_file)  # whole list of SIP packets
+    cli_and_cld = cli_cld_getter(packets)
+
+    arr_caller = get_packets_by_side(packets, cli_and_cld[0])
+    arr_callee = get_packets_by_side(packets, cli_and_cld[1])
+    print("", arr_caller)
+    print("", arr_callee)
+
+    # TODO   check if the CLI == packet source ip. If yes we write form of SIP packet to the SIPp script for caller
+    #   if no - we
 
     for i in listbox.curselection():
-        print(listbox.get(i))
+        print("Chosen Call-ID: ", listbox.get(i))
+
         caller.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?> <!DOCTYPE scenario SYSTEM \sipp.dtd\"\n<scenario name=\"UAC with media\">\n \
     <send retrans=\"500\">")
-        print("QQQQQQQQQQQQQQQQ", pcap_file)
-        cli_cld_getter(pcap_file)
+        print("FILE: ", pcap_file)
+
+    caller.close()
+    callee.close()
 
 
 class Toplevel1:

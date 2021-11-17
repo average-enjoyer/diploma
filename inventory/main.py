@@ -300,9 +300,14 @@ def generate(listbox, Label2):
                         callee.write(item + '\n')
             callee.write("\n]]>\n</send>\n\n")
         elif side_ip == packet.ip.dst:
+            print(field_names)
             if "sip.Status-Line" in field_names:
                 expected_code = "".join(re.findall(r'[0-9]{3}', field_names["sip.Status-Line"]))
                 callee.write("<recv response=\"" + expected_code + "\" optional=\"true\">\n</recv>\n")
+            elif "sip.Method" in field_names:
+                print(field_names["sip.Method"])
+                expected = field_names["sip.Method"]
+                callee.write("<recv request=\"" + expected + "\" crlf=\"true\">\n</recv>\n")
     callee.write("\n</scenario>")
     callee.close()
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE scenario SYSTEM "sipp.dtd">
 <scenario name="UAC">
+<recv request="INVITE" crlf="true">
+</recv>
 <send>
 <![CDATA[
 
@@ -46,6 +48,8 @@ a=sendrecv
 ]]>
 </send>
 
+<recv request="ACK" crlf="true">
+</recv>
 <send>
 <![CDATA[
 

@@ -4,21 +4,25 @@
 <send>
 <![CDATA[
 
-INVITE sip:9999@192.168.0.107 SIP/2.0
-Via: SIP/2.0/UDP 192.168.0.104:5061;branch=z9hG4bK-947b3604
-From: "7777" <sip:7777@192.168.0.107>;tag=1826957c10254ebao1
-To: <sip:9999@192.168.0.107>
-Call-ID: c7500624-fe265632@192.168.0.104
+INVITE sip:[field1]@[remote_ip] SIP/2.0
+Via: SIP/2.0/UDP [local_ip]:[local_port];branch=z9hG4bK-947b3604
+From: "[field0]" <sip:[field0]@[remote_ip]>;tag=1826957c10254ebao1
+To: <sip:[field1]@[remote_ip]>
+Call-ID: [call_id]
 CSeq: 101 INVITE
 Max-Forwards: 70
-Contact: "7777" <sip:7777@192.168.0.104:5061>
+Contact: "[field0]" <sip:[field0]@[local_ip]:[local_port]>
+Expires: 240
 User-Agent: Linksys/SPA941-5.1.8
-Content-Length: 393
+Content-Length: [len]
+Allow: ACK, BYE, CANCEL, INFO, INVITE, NOTIFY, OPTIONS, REFER
+Supported: replaces
+Content-Type: application/sdp
 
 v=0
-o=- 4999 4999 IN IP4 192.168.0.104
+o=- 4999 4999 IN IP4 [local_ip]
 s=-
-c=IN IP4 192.168.0.104
+c=IN IP4 [local_ip]
 t=0 0
 m=audio 16398 RTP/AVP 0 2 4 8 18 96 97 98 101
 a=rtpmap:0 PCMU/8000
@@ -42,16 +46,17 @@ a=sendrecv
 <send>
 <![CDATA[
 
-ACK sip:9999@192.168.0.107 SIP/2.0
-Via: SIP/2.0/UDP 192.168.0.104:5061;branch=z9hG4bK-947b3604
-From: "7777" <sip:7777@192.168.0.107>;tag=1826957c10254ebao1
-To: <sip:9999@192.168.0.107>;tag=as59ad6dca
-Call-ID: c7500624-fe265632@192.168.0.104
+ACK sip:[field1]@[remote_ip] SIP/2.0
+Via: SIP/2.0/UDP [local_ip]:[local_port];branch=z9hG4bK-947b3604
+From: "[field0]" <sip:[field0]@[remote_ip]>;tag=1826957c10254ebao1
+To: <sip:[field1]@[remote_ip]>;tag=as59ad6dca
+Call-ID: [call_id]
 CSeq: 101 ACK
 Max-Forwards: 70
-Contact: "7777" <sip:7777@192.168.0.104:5061>
+Contact: "[field0]" <sip:[field0]@[local_ip]:[local_port]>
 User-Agent: Linksys/SPA941-5.1.8
-Content-Length: 0
+Content-Length: [len]
+
 
 ]]>
 </send>
@@ -59,21 +64,26 @@ Content-Length: 0
 <send>
 <![CDATA[
 
-INVITE sip:9999@192.168.0.107 SIP/2.0
-Via: SIP/2.0/UDP 192.168.0.104:5061;branch=z9hG4bK-e1ae6044
-From: "7777" <sip:7777@192.168.0.107>;tag=1826957c10254ebao1
-To: <sip:9999@192.168.0.107>
-Call-ID: c7500624-fe265632@192.168.0.104
+INVITE sip:[field1]@[remote_ip] SIP/2.0
+Via: SIP/2.0/UDP [local_ip]:[local_port];branch=z9hG4bK-e1ae6044
+From: "[field0]" <sip:[field0]@[remote_ip]>;tag=1826957c10254ebao1
+To: <sip:[field1]@[remote_ip]>
+Call-ID: [call_id]
 CSeq: 102 INVITE
 Max-Forwards: 70
-Contact: "7777" <sip:7777@192.168.0.104:5061>
+[field5]
+Contact: "[field0]" <sip:[field0]@[local_ip]:[local_port]>
+Expires: 240
 User-Agent: Linksys/SPA941-5.1.8
-Content-Length: 393
+Content-Length: [len]
+Allow: ACK, BYE, CANCEL, INFO, INVITE, NOTIFY, OPTIONS, REFER
+Supported: replaces
+Content-Type: application/sdp
 
 v=0
-o=- 4999 4999 IN IP4 192.168.0.104
+o=- 4999 4999 IN IP4 [local_ip]
 s=-
-c=IN IP4 192.168.0.104
+c=IN IP4 [local_ip]
 t=0 0
 m=audio 16398 RTP/AVP 0 2 4 8 18 96 97 98 101
 a=rtpmap:0 PCMU/8000
@@ -101,16 +111,18 @@ a=sendrecv
 <send>
 <![CDATA[
 
-ACK sip:9999@192.168.0.107:5060 SIP/2.0
-Via: SIP/2.0/UDP 192.168.0.104:5061;branch=z9hG4bK-c2c3680a
-From: "7777" <sip:7777@192.168.0.107>;tag=1826957c10254ebao1
-To: <sip:9999@192.168.0.107>;tag=as41862f79
-Call-ID: c7500624-fe265632@192.168.0.104
+ACK sip:[field1]@[remote_ip]:[remote_port] SIP/2.0
+Via: SIP/2.0/UDP [local_ip]:[local_port];branch=z9hG4bK-c2c3680a
+From: "[field0]" <sip:[field0]@[remote_ip]>;tag=1826957c10254ebao1
+To: <sip:[field1]@[remote_ip]>;tag=as41862f79
+Call-ID: [call_id]
 CSeq: 102 ACK
 Max-Forwards: 70
-Contact: "7777" <sip:7777@192.168.0.104:5061>
+[field5]
+Contact: "[field0]" <sip:[field0]@[local_ip]:[local_port]>
 User-Agent: Linksys/SPA941-5.1.8
-Content-Length: 0
+Content-Length: [len]
+
 
 ]]>
 </send>
@@ -119,12 +131,14 @@ Content-Length: 0
 <![CDATA[
 
 SIP/2.0 200 OK
-To: "7777" <sip:7777@192.168.0.107>;tag=1826957c10254ebao1
-From: <sip:9999@192.168.0.107>;tag=as41862f79
-Call-ID: c7500624-fe265632@192.168.0.104
+To: "[field1]" <sip:[field1]@[remote_ip]>;tag=1826957c10254ebao1
+From: <sip:[field0]@[remote_ip]>;tag=as41862f79
+Call-ID: [call_id]
 CSeq: 102 BYE
-Via: SIP/2.0/UDP 192.168.0.107:5060;branch=z9hG4bK20e3d71c
-Content-Length: 0
+Via: SIP/2.0/UDP [remote_ip]:[local_port];branch=z9hG4bK20e3d71c
+Server: Linksys/SPA941-5.1.8
+Content-Length: [len]
+
 
 ]]>
 </send>

@@ -41,7 +41,7 @@ a=sendrecv
 ]]>
 </send>
 
-<recv response="401" optional="true">
+<recv response="401" auth="true">
 </recv>
 <send>
 <![CDATA[
@@ -102,11 +102,11 @@ a=sendrecv
 ]]>
 </send>
 
-<recv response="100" optional="true">
+<recv response="100">
 </recv>
-<recv response="180" optional="true">
+<recv response="180">
 </recv>
-<recv response="200" optional="true">
+<recv response="200">
 </recv>
 <send>
 <![CDATA[

@@ -174,8 +174,15 @@ def generate(listbox, Label2):
     # temp solution for obtaining SDP. https://github.com/KimiNewt/pyshark/issues/508
     flag = False
 
+    # Choosen Call-ID
+    call_id = ""
+    for i in listbox.curselection():
+        print("Chosen Call-ID: ", listbox.get(i))
+        call_id = listbox.get(i)
+
     pcap_file = Label2['text']
     # List with [CLI IP:PORT] and [CLD IP_PORT]
+    #TODO ADD call_id parameter
     packets = get_packets(pcap_file)  # whole list of SIP packets
     cli_and_cld = cli_cld_getter(packets)
 
@@ -186,8 +193,6 @@ def generate(listbox, Label2):
     #   if no - we write the "expect" construction to the SIPp script for caller
     #   analogically for callee
 
-    for i in listbox.curselection():
-        print("Chosen Call-ID: ", listbox.get(i))
 
     side_ip = "".join(re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', "".join(cli_and_cld[0])))
     print("SIDE", side_ip)
@@ -219,45 +224,6 @@ def generate(listbox, Label2):
                 sipp_packet = sipp_packet.replace("Content-Length: " + field_names["sip.Content-Length"],
                                                   "Content-Length: [len]")
             caller.write(sipp_packet)
-
-            # for field_name, field_value in zip(field_names, field_values):
-            #     if field_name != '':
-            #         if field_name == 'sip.Request-Line' and (
-            #                 'OPTIONS' or 'NOTIFY') not in field_value or field_name == 'sip.Status-Line':
-            #             caller.write(field_value + "\n")
-            #         if field_name == 'sip.Via' or \
-            #                 field_name == 'sip.From' or \
-            #                 field_name == 'sip.To' or \
-            #                 field_name == 'sip.Call-ID' or \
-            #                 field_name == 'sip.CSeq' or \
-            #                 field_name == 'sip.Contact' or \
-            #                 field_name == 'sip.Max-Forwards' or \
-            #                 field_name == 'sip.Subject' or \
-            #                 field_name == 'sip.mime.type' or \
-            #                 field_name == 'sip.Content-Length' or \
-            #                 field_name == 'sip.User-Agent':
-            #             # if field_name == 'sip.Call-ID':
-            #             #     print(field_value, "\n")
-            #             caller.write(field_name[4:] + ": " + field_value + "\n")
-            #
-            # # SDP processing (Just copying for now)
-            # if packet.sip.get_field("sdp_media_attr"):
-            #     # caller.write('v=' + packet.sip.get_field("sdp.version") + '\n')
-            #     # caller.write(packet.sip.get_field("sdp.media_attr") + '\n')
-            #     # caller.write('m=' + packet.sip.get_field("sdp.media") + '\n')
-            #
-            #     str1 = packet.sip.msg_hdr.replace('  ', '\n')
-            #     # packet as an array
-            #     in_arr = str1.split("\n")
-            #
-            #     for item in in_arr:
-            #         if len(item) == 0:
-            #             caller.write(item)
-            #             if not flag:
-            #                 caller.write("\n")
-            #             flag = not flag
-            #         elif flag:
-            #             caller.write(item + '\n')
             caller.write("\n]]>\n</send>\n\n")
         elif side_ip == packet.ip.dst:
             if "sip.Status-Line" in field_names:
@@ -300,45 +266,6 @@ def generate(listbox, Label2):
                 sipp_packet = sipp_packet.replace("Content-Length: " + field_names["sip.Content-Length"],
                                                   "Content-Length: [len]")
             callee.write(sipp_packet)
-            # packet.sip.get_field("sip.Request-Line")
-            # for field_name, field_value in zip(field_names, field_values):
-            #     if field_name != '':
-            #         if field_name == 'sip.Request-Line' and (
-            #                 'OPTIONS' or 'NOTIFY') not in field_value or field_name == 'sip.Status-Line':
-            #             callee.write(field_value + "\n")
-            #         if field_name == 'sip.Via' or \
-            #                 field_name == 'sip.From' or \
-            #                 field_name == 'sip.To' or \
-            #                 field_name == 'sip.Call-ID' or \
-            #                 field_name == 'sip.CSeq' or \
-            #                 field_name == 'sip.Contact' or \
-            #                 field_name == 'sip.Max-Forwards' or \
-            #                 field_name == 'sip.Subject' or \
-            #                 field_name == 'sip.mime.type' or \
-            #                 field_name == 'sip.Content-Length' or \
-            #                 field_name == 'sip.User-Agent':
-            #             # if field_name == 'sip.Call-ID':
-            #             #     print(field_value, "\n")
-            #             callee.write(field_name[4:] + ": " + field_value + "\n")
-            #
-            # # SDP processing (Just copying for now)
-            # if packet.sip.get_field("sdp_media_attr"):
-            #     # callee.write('v=' + packet.sip.get_field("sdp.version") + '\n')
-            #     # callee.write(packet.sip.get_field("sdp.media_attr") + '\n')
-            #     # callee.write('m=' + packet.sip.get_field("sdp.media") + '\n')
-            #
-            #     str1 = packet.sip.msg_hdr.replace('  ', '\n')
-            #     # packet as an array
-            #     in_arr = str1.split("\n")
-            #
-            #     for item in in_arr:
-            #         if len(item) == 0:
-            #             callee.write(item)
-            #             if not flag:
-            #                 callee.write("\n")
-            #             flag = not flag
-            #         elif flag:
-            #             callee.write(item + '\n')
             callee.write("\n]]>\n</send>\n\n")
         elif side_ip == packet.ip.dst:
             print(field_names)

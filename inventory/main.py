@@ -170,6 +170,50 @@ def get_packets_by_side(packets, socket):
     return result_list
 
 
+# checking whether the call has two call IDs
+def is_only_one_call_id(pcap_file, call_id):
+    capture = pyshark.FileCapture(pcap_file)
+    to_temp = ""
+    from_temp = ""
+    call_id_temp = ""
+
+    found_request = False
+
+    for packet in capture:
+        try:
+            if hasattr(packet, 'sip'):
+                field_names = packet.sip._all_fields
+                field_values = packet.sip._all_fields.values()
+                if field_names["sip.Call-ID"] == call_id:
+                    if "sip.Method" in field_names and not found_request:
+                        if field_names["sip.Method"] == "INVITE" or field_names["sip.Method"] == "REGISTER":
+                            to_temp = field_names["sip.to.addr"]
+                            from_temp = field_names["sip.from.addr"]
+                            print("to_temp", to_temp)
+                            print("from_temp", from_temp)
+                            print("from_temp", from_temp)
+                            print("CALL_ID", field_names["sip.Call-ID"])
+                            print("CALL_ID PARAM", call_id)
+                            call_id_temp = field_names["sip.Call-ID"]
+                            found_request = True
+                    elif to_temp != "" and from_temp != "" and found_request:
+                        if "sip.Status-Code" in field_names:
+                            if field_names["sip.Status-Code"] == "200":
+                                if field_names["sip.to.addr"] == to_temp and field_names["sip.from.addr"] == from_temp and call_id_temp != field_names["sip.Call-ID"]:
+                                    print("The call uses two different Call-IDs")
+                                    print("200 OK", field_names)
+                                    return True
+                                elif field_names["sip.to.addr"] == to_temp and field_names["sip.from.addr"] == from_temp and call_id_temp == field_names["sip.Call-ID"]:
+                                    print("CALL_ID 200 ", field_names["sip.Call-ID"])
+                                    print("200 OK", field_names)
+                                    print("The call uses the only one Call-ID")
+                                    return False
+        except OSError:
+            pass
+        except asyncio.TimeoutError:
+            pass
+
+
 def generate(listbox, Label2):
     # temp solution for obtaining SDP. https://github.com/KimiNewt/pyshark/issues/508
     flag = False
@@ -182,7 +226,9 @@ def generate(listbox, Label2):
 
     pcap_file = Label2['text']
     # List with [CLI IP:PORT] and [CLD IP_PORT]
-    #TODO ADD call_id parameter
+    # TODO ADD call_id parameter
+    is_only_one_call_id(pcap_file, call_id)
+
     packets = get_packets(pcap_file)  # whole list of SIP packets
     cli_and_cld = cli_cld_getter(packets)
 
@@ -192,7 +238,6 @@ def generate(listbox, Label2):
     #   We check if the CLI == packet source ip. If yes we write form of SIP packet to the SIPp script for caller
     #   if no - we write the "expect" construction to the SIPp script for caller
     #   analogically for callee
-
 
     side_ip = "".join(re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', "".join(cli_and_cld[0])))
     print("SIDE", side_ip)
@@ -230,7 +275,7 @@ def generate(listbox, Label2):
                 expected_code = "".join(re.findall(r'[0-9]{3}', field_names["sip.Status-Line"]))
                 if expected_code == "401" or expected_code == "407":
                     caller.write("<recv response=\"" + expected_code + "\" auth=\"true\">\n</recv>\n")
-                else :
+                else:
                     caller.write("<recv response=\"" + expected_code + "\">\n</recv>\n")
     caller.write("\n</scenario>")
     caller.close()

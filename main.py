@@ -267,14 +267,13 @@ def generate_cvs(arr_caller):
     vars_cld.close()
 
 
-def pretify_xml(file_path):
+def prettify_xml(file_path):
     dom = xml.dom.minidom.parse(file_path)  # or xml.dom.minidom.parseString(xml_string)
     pretty_xml_as_string = dom.toprettyxml()
     print(pretty_xml_as_string)
     xml_file = open(file_path, "w")
     xml_file.write(pretty_xml_as_string)
     xml_file.close()
-
 
 
 def generate(listbox, Label2, text_box):
@@ -403,9 +402,10 @@ def generate(listbox, Label2, text_box):
     print_log(text_box,
               "To start the script use the following command:\n   sudo sipp [PBX IP] -i [LOCAL IP] -p [LOCAL PORT]  -sf ./results/script.xml -inf ./results/cars.csv -m 1 -max_socket 100")
     if os.path.exists(caller.name):
-        pretify_xml(caller.name)
+        prettify_xml(caller.name)
     if os.path.exists(callee.name):
-        pretify_xml(callee.name)
+        prettify_xml(callee.name)
+
 
 class Toplevel1:
 

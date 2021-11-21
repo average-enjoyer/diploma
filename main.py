@@ -7,6 +7,7 @@
 
 import asyncio
 import re
+import os
 from tkinter import *
 from tkinter.filedialog import askopenfilename
 
@@ -29,8 +30,12 @@ except ImportError:
 import main_support
 
 # SIPp files
-caller = open("caller.xml", "w")
-callee = open("callee.xml", "w")
+try:
+    os.mkdir("./results")
+except OSError as error:
+    print(error)
+caller = open("./results/caller.xml", "w")
+callee = open("./results/callee.xml", "w")
 
 
 def vp_start_gui():
@@ -228,8 +233,10 @@ def is_only_one_call_id(pcap_file, call_id):
 #                         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!2", res)
 #                         return res
 
+def print_log(text_box, test):
+    text_box.insert(tk.END, test + "\n")
 
-def generate(listbox, Label2):
+def generate(listbox, Label2 , text_box):
     # temp solution for obtaining SDP. https://github.com/KimiNewt/pyshark/issues/508
     flag = False
 
@@ -338,6 +345,17 @@ def generate(listbox, Label2):
     callee.write("\n</scenario>")
     callee.close()
 
+    print_log(text_box, "The following file(s) has been generated:")
+    print_log(text_box, "   ./results/caller.xml – File for CLI")
+    if len(open("./results/callee.xml", "r").read()) < 120 :
+        print_log(text_box, "The only caller SIPp script has been generated! There is no CLD side in the call")
+        try:
+            os.remove("./results/callee.xml")
+        except OSError as error:
+            print(error)
+    else:
+        print_log(text_box, "   ./results/callee.xml – File for CLD")
+    print_log(text_box, "To start the script use the following command:\n   sudo sipp [PBX IP] -i [LOCAL IP] -p [LOCAL PORT]  -sf ./results/script.xml -inf ./results/cars.csv -m 1 -max_socket 100")
 
 class Toplevel1:
 
@@ -357,7 +375,7 @@ class Toplevel1:
 
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
-           top is the toplevel containing window.'''
+               top is the toplevel containing window.'''
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9'  # X11 color: 'gray85'
@@ -414,7 +432,7 @@ class Toplevel1:
         self.Button2.configure(text='''Generate''')
 
         self.Button2.configure(
-            command=lambda: generate(self.Listbox1, self.Label2))  # lambda is important when we pass arguments
+            command=lambda: generate(self.Listbox1, self.Label2, self.Text1))  # lambda is important when we pass arguments
 
         self.menubar = tk.Menu(top, font="TkMenuFont", bg=_bgcolor, fg=_fgcolor)
         top.configure(menu=self.menubar)
@@ -430,6 +448,7 @@ class Toplevel1:
         self.Label4.configure(font="-family {Tlwg Typewriter} -size 12")
         self.Label4.configure(text='''Log messages:''')
 
+
         self.Text1 = tk.Text(top)
         self.Text1.place(relx=0.033, rely=0.797, relheight=0.169, relwidth=0.931)
 
@@ -439,6 +458,11 @@ class Toplevel1:
         self.Text1.configure(selectforeground="white")
         self.Text1.configure(wrap="word")
 
+        # Create a scrollbar
+        scroll_bar = tk.Scrollbar(self.Text1)
+        # Pack the scroll bar
+        # Place it to the right side, using tk.RIGHT
+        scroll_bar.pack(side=tk.RIGHT, fill=Y)
 
 if __name__ == '__main__':
     vp_start_gui()

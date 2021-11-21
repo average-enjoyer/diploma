@@ -236,7 +236,38 @@ def is_only_one_call_id(pcap_file, call_id):
 def print_log(text_box, test):
     text_box.insert(tk.END, test + "\n")
 
-def generate(listbox, Label2 , text_box):
+
+# We pass the only caller SIP packets, because headers To and From supposed to be the same for CLI and CLD packets.
+# Could be improved in the future is there is a need,
+def generate_cvs(arr_caller):
+    template_cli = "SEQUENTIAL\ncli;cld;;;;[authentication username=usrnm password=***]"
+    to_value = ""
+    from_value = ""
+
+    for packet in arr_caller:
+        field_names = packet.sip._all_fields
+        if "sip.Status-Code" in field_names:
+            to_value = field_names["sip.to.user"]
+            from_value = field_names["sip.from.user"]
+            break
+    template_cli = template_cli.replace("cli", to_value)
+    template_cli = template_cli.replace("cld", from_value)
+    template_cld = template_cli
+    template_cli = template_cli.replace("usrnm", from_value)
+    template_cld = template_cld.replace("usrnm", to_value)
+
+    vars_cli = open("./results/vars_cli.csv", "w")
+    vars_cld = open("./results/vars_cld.csv", "w")
+
+    vars_cli.write(template_cli)
+    vars_cld.write(template_cld)
+
+    vars_cli.close()
+    vars_cld.close()
+
+
+
+def generate(listbox, Label2, text_box):
     # temp solution for obtaining SDP. https://github.com/KimiNewt/pyshark/issues/508
     flag = False
 
@@ -254,6 +285,9 @@ def generate(listbox, Label2 , text_box):
 
     arr_caller = get_packets_by_side(packets, cli_and_cld[0])
     arr_callee = get_packets_by_side(packets, cli_and_cld[1])
+
+    # Generates CSV from both sides: CLI and CLD
+    generate_cvs(arr_caller)
 
     #   We check if the CLI == packet source ip. If yes we write form of SIP packet to the SIPp script for caller
     #   if no - we write the "expect" construction to the SIPp script for caller
@@ -347,7 +381,7 @@ def generate(listbox, Label2 , text_box):
 
     print_log(text_box, "The following file(s) has been generated:")
     print_log(text_box, "   ./results/caller.xml – File for CLI")
-    if len(open("./results/callee.xml", "r").read()) < 120 :
+    if len(open("./results/callee.xml", "r").read()) < 120:
         print_log(text_box, "The only caller SIPp script has been generated! There is no CLD side in the call")
         try:
             os.remove("./results/callee.xml")
@@ -355,7 +389,9 @@ def generate(listbox, Label2 , text_box):
             print(error)
     else:
         print_log(text_box, "   ./results/callee.xml – File for CLD")
-    print_log(text_box, "To start the script use the following command:\n   sudo sipp [PBX IP] -i [LOCAL IP] -p [LOCAL PORT]  -sf ./results/script.xml -inf ./results/cars.csv -m 1 -max_socket 100")
+    print_log(text_box,
+              "To start the script use the following command:\n   sudo sipp [PBX IP] -i [LOCAL IP] -p [LOCAL PORT]  -sf ./results/script.xml -inf ./results/cars.csv -m 1 -max_socket 100")
+
 
 class Toplevel1:
 
@@ -432,7 +468,8 @@ class Toplevel1:
         self.Button2.configure(text='''Generate''')
 
         self.Button2.configure(
-            command=lambda: generate(self.Listbox1, self.Label2, self.Text1))  # lambda is important when we pass arguments
+            command=lambda: generate(self.Listbox1, self.Label2,
+                                     self.Text1))  # lambda is important when we pass arguments
 
         self.menubar = tk.Menu(top, font="TkMenuFont", bg=_bgcolor, fg=_fgcolor)
         top.configure(menu=self.menubar)
@@ -448,7 +485,6 @@ class Toplevel1:
         self.Label4.configure(font="-family {Tlwg Typewriter} -size 12")
         self.Label4.configure(text='''Log messages:''')
 
-
         self.Text1 = tk.Text(top)
         self.Text1.place(relx=0.033, rely=0.797, relheight=0.169, relwidth=0.931)
 
@@ -463,6 +499,7 @@ class Toplevel1:
         # Pack the scroll bar
         # Place it to the right side, using tk.RIGHT
         scroll_bar.pack(side=tk.RIGHT, fill=Y)
+
 
 if __name__ == '__main__':
     vp_start_gui()

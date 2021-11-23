@@ -438,7 +438,7 @@ class Toplevel1:
         # os.system('xterm -into %d -geometry 40x20 -sb &' % wid)
 
         pcap_file = '''The file hasn't been chosen.'''
-        top.geometry("610x480+645+330")
+        top.geometry("610x580+645+330")
         top.minsize(1, 1)
         top.maxsize(1905, 1050)
         top.resizable(1, 1)

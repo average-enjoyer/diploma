@@ -1,0 +1,110 @@
+<?xml version="1.0" ?>
+<!DOCTYPE scenario
+  SYSTEM 'sipp.dtd'>
+<scenario name="UAC">
+	
+
+	<recv request="INVITE" crlf="true">
+</recv>
+	
+
+	<send>
+		
+
+<![CDATA[
+
+SIP/2.0 180 Ringing
+Via: SIP/2.0/UDP [remote_ip]:[local_port];branch=z9hG4bK-524287-1---35fba60b8225f220db1b7c1749f78a38;rport=[local_port]
+Via: SIP/2.0/UDP 192.168.0.179:5070;rport=5070;branch=z9hG4bK-2zeimos75umemrgo
+Record-Route: <sip:[remote_ip];lr;ep;pinhole=UDP:[local_ip]:8957;ipnt=8j0*jv+npf4>
+Contact: <sip:[field1]@[local_ip]:8957>;+sip.instance="<urn:uuid:74dc8fb7-756f-4a78-a3fc-7382245e4137>"
+To: <sip:[field1]@[remote_ip]>;tag=ce51971d
+From: [field0] <sip:[field0]@[remote_ip]>;tag=lmlmyjkeqopua6hy.o
+Call-ID: [call_id]
+CSeq: 274 INVITE
+User-Agent: PortSIP UC Client
+Android - v16.0.001
+Content-Length: [len]
+
+
+]]>		
+
+	</send>
+	
+
+
+	<send>
+		
+
+<![CDATA[
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP [remote_ip]:[local_port];branch=z9hG4bK-524287-1---35fba60b8225f220db1b7c1749f78a38;rport=[local_port]
+Via: SIP/2.0/UDP 192.168.0.179:5070;rport=5070;branch=z9hG4bK-2zeimos75umemrgo
+Record-Route: <sip:[remote_ip];lr;ep;pinhole=UDP:[local_ip]:8957;ipnt=8j0*jv+npf4>
+Contact: <sip:[field1]@[local_ip]:8957>;+sip.instance="<urn:uuid:74dc8fb7-756f-4a78-a3fc-7382245e4137>"
+To: <sip:[field1]@[remote_ip]>;tag=ce51971d
+From: [field0] <sip:[field0]@[remote_ip]>;tag=lmlmyjkeqopua6hy.o
+Call-ID: [call_id]
+CSeq: 274 INVITE
+Allow: INVITE, ACK, CANCEL, OPTIONS, BYE, REFER, NOTIFY, MESSAGE, REGISTER, SUBSCRIBE, INFO, PUBLISH
+Content-Type: application/sdp
+Supported: replaces, answermode, eventlist, outbound, path
+User-Agent: PortSIP UC Client
+Android - v16.0.001
+Allow-Events: hold, talk, conference, dialog
+Content-Length: [len]
+
+v=0
+o=- 1637597766 1 IN IP4 [local_ip]
+s=ps
+c=IN IP4 [local_ip]
+t=0 0
+m=audio 10000 RTP/AVP 8 0 101
+a=rtpmap:8 PCMA/8000
+a=rtpmap:0 PCMU/8000
+a=rtpmap:101 telephone-event/8000
+a=fmtp:101 0-15
+a=mid:audio
+a=sendrecv
+
+]]>		
+
+	</send>
+	
+
+
+	<recv request="ACK" crlf="true">
+</recv>
+	
+
+	<recv request="BYE" crlf="true">
+</recv>
+	
+
+	<send>
+		
+
+<![CDATA[
+
+SIP/2.0 200 OK
+Via: SIP/2.0/UDP [remote_ip]:[local_port];branch=z9hG4bK-524287-1---4afb7c675da175793fff0bb4c7942df1;rport=[local_port]
+Via: SIP/2.0/UDP 192.168.0.179:5070;rport=5070;branch=z9hG4bK-fmupoeujh26utf6h
+Contact: <sip:[field1]@[local_ip]:8957>;+sip.instance="<urn:uuid:74dc8fb7-756f-4a78-a3fc-7382245e4137>"
+To: <sip:[field1]@[remote_ip]>;tag=ce51971d
+From: [field0] <sip:[field0]@[remote_ip]>;tag=lmlmyjkeqopua6hy.o
+Call-ID: [call_id]
+CSeq: 275 BYE
+User-Agent: PortSIP UC Client
+Android - v16.0.001
+Content-Length: [len]
+
+
+]]>		
+
+	</send>
+	
+
+
+
+</scenario>

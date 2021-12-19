@@ -35,7 +35,8 @@ pip install python-tk
 ### Known limitations (future improvements)
 - UDP only;
 - doesn't support BLF;
-- doesn't generates media files.
+- requires lots of time when large .pcap file is loaded.
+- doesn't generate media files.
 
 ### License
 [GNU GPLv3](ttps://en.wikipedia.org/wiki/GNU_General_Public_License)
